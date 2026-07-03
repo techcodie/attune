@@ -6,11 +6,13 @@ import { PasswordField } from '@/components/ui/PasswordField';
 import { Button } from '@/components/ui/Button';
 import { useZodForm } from '@/hooks/useZodForm';
 import { useLogin } from '@/features/auth/useAuthMutations';
+import { useDemoLogin } from '@/features/auth/useDemoLogin';
 import { toast } from '@/features/toast/useToastStore';
 
 export function Login() {
   const navigate = useNavigate();
   const login = useLogin();
+  const demo = useDemoLogin();
 
   const form = useZodForm({
     schema: loginSchema,
@@ -61,6 +63,25 @@ export function Login() {
           Sign in
         </Button>
       </form>
+
+      <div className="mt-6 flex items-center gap-3 text-xs text-slate-600">
+        <span className="h-px flex-1 bg-white/10" />
+        or
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
+
+      <Button
+        variant="ghost"
+        fullWidth
+        className="mt-4"
+        loading={demo.isPending}
+        onClick={demo.demoLogin}
+      >
+        Try the demo account →
+      </Button>
+      <p className="mt-2 text-center text-xs text-slate-600">
+        No sign-up — explore a populated dashboard instantly.
+      </p>
     </AuthShell>
   );
 }

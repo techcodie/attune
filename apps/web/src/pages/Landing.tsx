@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useHealth } from '@/hooks/useHealth';
 import { StatusPill } from '@/components/StatusPill';
+import { useDemoLogin } from '@/features/auth/useDemoLogin';
 
 /** A few animated bars that hint at the voice waveform to come in M5. */
 function WaveformTeaser() {
@@ -28,6 +29,7 @@ function WaveformTeaser() {
 
 export function Landing() {
   const { data, isLoading, isError } = useHealth();
+  const demo = useDemoLogin();
 
   const apiState = isLoading ? 'loading' : isError ? 'down' : 'ok';
   const dbState = isLoading
@@ -73,9 +75,16 @@ export function Landing() {
           <StatusPill label="Database" state={dbState} />
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link to="/register" className="btn-primary flex-1">
-            Get started
+        <button
+          onClick={demo.demoLogin}
+          disabled={demo.isPending}
+          className="btn-primary mt-8 w-full disabled:opacity-60"
+        >
+          {demo.isPending ? 'Signing you in…' : 'Try the live demo — no sign-up →'}
+        </button>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+          <Link to="/register" className="btn-ghost flex-1">
+            Create account
           </Link>
           <Link to="/login" className="btn-ghost flex-1">
             Sign in
