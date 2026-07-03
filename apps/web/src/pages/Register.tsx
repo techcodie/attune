@@ -17,7 +17,7 @@ export function Register() {
     initial: { fullName: '', email: '', password: '' },
     onSubmit: async (values) => {
       await register.mutateAsync(values);
-      toast.success(`Welcome to Cadence, ${values.fullName.split(' ')[0]}!`);
+      toast.success(`Welcome to Attune, ${values.fullName.split(' ')[0]}!`);
       // New accounts always route into the profile flow next.
       navigate('/profile', { replace: true });
     },

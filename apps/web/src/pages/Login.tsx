@@ -29,7 +29,7 @@ export function Login() {
       subtitle="Pick up where you left off."
       footer={
         <>
-          New to Cadence?{' '}
+          New to Attune?{' '}
           <Link to="/register" className="font-medium text-accent-400 hover:text-accent-500">
             Create an account
           </Link>

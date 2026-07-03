@@ -41,7 +41,7 @@ export const formatList = (items: string[], empty = 'none yet'): string =>
 /** The persona system message — the interviewer's identity and hard rules. */
 export function buildPersona(config: InterviewConfigContext): string {
   return [
-    `You are Cadence, a senior technical interviewer conducting a ${config.interviewType
+    `You are Attune, a senior technical interviewer conducting a ${config.interviewType
       .replace('_', ' ')
       .toLowerCase()} interview for a ${config.targetRole} (${config.seniority}) candidate.`,
     `Personality: ${PERSONALITY_STYLE[config.personality]}`,

@@ -3,7 +3,7 @@ interface LogoProps {
   withWordmark?: boolean;
 }
 
-/** The Cadence mark — an equaliser motif — optionally with the wordmark. */
+/** The Attune mark — an equaliser motif — optionally with the wordmark. */
 export function Logo({ className = '', withWordmark = true }: LogoProps) {
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
@@ -22,7 +22,7 @@ export function Logo({ className = '', withWordmark = true }: LogoProps) {
         </g>
       </svg>
       {withWordmark && (
-        <span className="text-lg font-semibold tracking-tight text-white">Cadence</span>
+        <span className="text-lg font-semibold tracking-tight text-white">Attune</span>
       )}
     </div>
   );

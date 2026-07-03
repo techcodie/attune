@@ -51,7 +51,7 @@ export function Landing() {
         </span>
 
         <h1 className="mt-6 bg-gradient-to-br from-white via-slate-200 to-slate-400 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl">
-          Cadence
+          Attune
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-slate-400">
           An AI mock interview that <span className="text-slate-200">listens, adapts, and pushes back</span> —
@@ -82,10 +82,6 @@ export function Landing() {
           </Link>
         </div>
       </motion.div>
-
-      <p className="mt-10 text-xs text-slate-600">
-        Milestone 1 — auth &amp; profile. LangGraph brain, voice, and reports arrive next.
-      </p>
     </main>
   );
 }
