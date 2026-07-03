@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "pnpm --filter @cadence/web build",
+  "buildCommand": "pnpm --filter @cadence/types build && pnpm --filter @cadence/web build",
   "outputDirectory": "dist",
   "installCommand": "pnpm install --frozen-lockfile",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
