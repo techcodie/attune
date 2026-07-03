@@ -1,14 +1,7 @@
-import express, { type Express } from 'express';
+import express, { type Express, type RequestHandler } from 'express';
 import cors from 'cors';
 import * as helmetModule from 'helmet';
 import cookieParser from 'cookie-parser';
-
-// helmet 8 exposes its middleware factory only as the `default` export, and its
-// package `exports` map has no `types` condition — so `import helmet from 'helmet'`
-// binds to the whole namespace object (not callable) under builders that classify
-// it as CommonJS (e.g. Vercel's). Taking `.default` off the namespace resolves it
-// correctly under any moduleResolution / esModuleInterop setting.
-const helmet = helmetModule.default;
 import { env, isProd } from './env.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { errorHandler } from './middleware/error.js';
@@ -21,6 +14,13 @@ import { profileRouter } from './modules/profile/profile.routes.js';
 import { interviewRouter } from './modules/interview/interview.routes.js';
 import { conversationRouter } from './modules/conversation/conversation.routes.js';
 import { reportRouter } from './modules/evaluation/report.routes.js';
+
+// helmet 8 exposes its middleware factory only as the `default` export and ships
+// no `types` condition in its package exports, so some compilers (notably
+// Vercel's) mis-type it as a non-callable namespace and fail the build. At
+// runtime `.default` IS the factory, so we cast to its known callable type —
+// this compiles under any moduleResolution / esModuleInterop setting.
+const helmet = helmetModule.default as unknown as () => RequestHandler;
 
 /**
  * Builds the Express app. Kept separate from the server bootstrap so it can be
