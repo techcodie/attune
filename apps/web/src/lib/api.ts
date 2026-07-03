@@ -1,6 +1,10 @@
 import type { ApiResponse } from '@cadence/types';
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
+// When VITE_API_URL is unset/empty we use same-origin relative calls so the app
+// works behind a reverse proxy (the Vercel rewrite forwards /api → the backend),
+// which avoids CORS and cross-origin caching issues. Dev sets VITE_API_URL to the
+// local API. Trailing slashes are trimmed so `${BASE}/api/v1` never doubles up.
+const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 const API = `${BASE_URL}/api/v1`;
 
 /** Thrown on any non-ok API response; carries the stable server error code. */

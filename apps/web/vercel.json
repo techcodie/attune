@@ -4,7 +4,13 @@
   "buildCommand": "pnpm --filter @cadence/types build && pnpm --filter @cadence/web build",
   "outputDirectory": "dist",
   "installCommand": "pnpm install --frozen-lockfile",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://mentorque-assignment-1-vrq8.onrender.com/api/$1"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
