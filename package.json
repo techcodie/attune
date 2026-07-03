@@ -1,0 +1,32 @@
+{
+  "name": "cadence",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cadence — a voice-first AI mock interview platform. LangGraph is the mind; ElevenLabs is the voice.",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --stream -r dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "db:generate": "pnpm --filter @cadence/api db:generate",
+    "db:migrate": "pnpm --filter @cadence/api db:migrate",
+    "db:seed": "pnpm --filter @cadence/api db:seed",
+    "db:studio": "pnpm --filter @cadence/api db:studio"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "esbuild"
+    ]
+  }
+}

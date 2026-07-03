@@ -1,0 +1,37 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# builds
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# env
+.env
+.env.local
+.env.*.local
+
+# prisma
+apps/api/prisma/*.db
+apps/api/prisma/migrations/dev.db*
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor / os
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# vite
+apps/web/dist/
+apps/web/.vite/
+
+# test coverage output (scoped so it never matches the src/modules/coverage engine)
+/coverage/
+apps/*/coverage/
