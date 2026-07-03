@@ -8,8 +8,11 @@
     "node": ">=20.11.0"
   },
   "scripts": {
+    "predev": "pnpm --filter @cadence/types build",
     "dev": "pnpm --parallel --stream -r dev",
     "build": "pnpm -r build",
+    "build:api": "pnpm --filter @cadence/types build && pnpm --filter @cadence/api build",
+    "start:api": "pnpm --filter @cadence/api start:prod",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean && rm -rf node_modules",

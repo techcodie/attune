@@ -226,7 +226,7 @@ All under `/api/v1`, JSON envelope `{ ok, data | error }`, owner-scoped, JWT-gat
 
 **Database — Neon:** create a project, copy the pooled connection string into the API's `DATABASE_URL`.
 
-**API — Railway:** point at `apps/api`, set env vars, build `pnpm install && pnpm --filter @cadence/api build`, start via the `Procfile` (`start:prod` runs `prisma migrate deploy` then the server). Set `CORS_ORIGIN` to the Vercel URL and `NODE_ENV=production`.
+**API — Railway:** root directory = **repo root** (the monorepo, so the shared `@cadence/types` package builds). Build: `pnpm install --frozen-lockfile && pnpm run build:api`. Start: the root `Procfile` runs `pnpm run start:api`, which applies `prisma migrate deploy` and then boots the compiled server. Set the env vars below, `CORS_ORIGIN` to the Vercel URL, and `NODE_ENV=production`.
 
 **Web — Vercel:** import the repo, root `apps/web` (config in `vercel.json`), set `VITE_API_URL` to the Railway URL. SPA rewrites and long-cache asset headers are pre-configured.
 
