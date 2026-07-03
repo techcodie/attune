@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-200 antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Ambient gradient wash behind the whole app. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60rem 60rem at 15% -10%, rgba(124, 108, 255, 0.18), transparent 60%),
+      radial-gradient(50rem 50rem at 110% 10%, rgba(55, 230, 208, 0.12), transparent 55%);
+  }
+}
+
+@layer components {
+  /* The glassmorphism surface used across cards, panels and the mic dock. */
+  .glass {
+    @apply border border-white/10 bg-white/[0.04] shadow-glass backdrop-blur-xl;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-2.5
+      font-medium text-white shadow-glow transition
+      hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-accent/60
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10
+      px-5 py-2.5 font-medium text-slate-200 transition hover:bg-white/5;
+  }
+}
+
+/* Print-to-PDF: convert the dark report to a clean, ink-friendly light layout. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+  body::before {
+    display: none !important;
+  }
+  .report-print .glass,
+  .report-print.glass {
+    background: #fff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    break-inside: avoid;
+  }
+  /* Remap the dark palette to readable dark-on-white. */
+  .report-print .text-white {
+    color: #0b0d1a !important;
+  }
+  .report-print .text-slate-200,
+  .report-print .text-slate-300,
+  .report-print .text-slate-400 {
+    color: #1e293b !important;
+  }
+  .report-print .text-slate-500,
+  .report-print .text-slate-600 {
+    color: #475569 !important;
+  }
+}
