@@ -1,0 +1,268 @@
+// Cadence database schema.
+// M0 established the datasource + generator.
+// M1 adds real auth (User + RefreshToken) and the candidate Profile that will
+// seed InterviewState in M2/M3.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Kept in sync with the InterviewType / ExperienceLevel unions in @cadence/types.
+enum InterviewType {
+  BEHAVIORAL
+  SYSTEM_DESIGN
+  CODING
+  PRODUCT_SENSE
+  LEADERSHIP
+}
+
+enum ExperienceLevel {
+  INTERN
+  JUNIOR
+  MID
+  SENIOR
+  STAFF
+  PRINCIPAL
+}
+
+enum InterviewerPersonality {
+  FRIENDLY_MENTOR
+  NEUTRAL_PROFESSIONAL
+  SKEPTICAL_STAFF_ENGINEER
+  FAANG_BAR_RAISER
+}
+
+enum InterviewStatus {
+  CREATED
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum InterviewStage {
+  INTRODUCTION
+  WARMUP
+  CORE
+  DEEP_DIVE
+  CHALLENGE
+  WRAP_UP
+  COMPLETED
+}
+
+enum Speaker {
+  INTERVIEWER
+  CANDIDATE
+}
+
+enum TimelineEventType {
+  INTERVIEW_CREATED
+  INTERVIEW_STARTED
+  STAGE_CHANGED
+  QUESTION_ASKED
+  ANSWER_RECEIVED
+  FOLLOW_UP_ASKED
+  DIFFICULTY_CHANGED
+  EVALUATION_RECORDED
+  INTERVIEW_COMPLETED
+  NOTE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile       Profile?
+  refreshTokens RefreshToken[]
+  interviews    Interview[]
+
+  @@map("users")
+}
+
+/// One row per issued refresh token. We only ever store a SHA-256 hash of the
+/// token, never the token itself. Rotation revokes the old row and links it to
+/// its successor so a replayed (already-rotated) token can be detected.
+model RefreshToken {
+  id                  String    @id @default(cuid())
+  tokenHash           String    @unique
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt           DateTime
+  revokedAt           DateTime?
+  replacedByTokenHash String?
+  deviceInfo          String?
+  ipAddress           String?
+  createdAt           DateTime  @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+/// Candidate profile — completed after registration. These fields initialize
+/// the CandidateProfile inside InterviewState when an interview starts.
+model Profile {
+  id              String          @id @default(cuid())
+  userId          String          @unique
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetRole      String
+  experienceLevel ExperienceLevel
+  yearsExperience Int
+  preferredType   InterviewType
+  focusSkills     String[]
+  careerGoal      String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("profiles")
+}
+
+/// A single mock interview. Holds immutable configuration + lifecycle; the
+/// mutable "brain state" lives in the 1:1 InterviewState. M3 drives it.
+model Interview {
+  id                     String                 @id @default(cuid())
+  userId                 String
+  user                   User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // configuration
+  interviewType          InterviewType
+  interviewerPersonality InterviewerPersonality
+  targetRole             String
+  difficulty             Int                    @default(3) // 1–5, evolves during the interview
+  baseDifficulty         Int                    @default(3) // the configured baseline; restart resets to this
+  durationMinutes        Int                    @default(30)
+  focusSkills            String[]
+  preferredLanguage      String                 @default("en") // future-ready (M4)
+  voicePreference        String? // future-ready (M4)
+
+  // lifecycle
+  status                 InterviewStatus        @default(CREATED)
+  startedAt              DateTime?
+  completedAt            DateTime?
+  durationSec            Int? // actual elapsed, set on completion
+
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+
+  state                  InterviewState?
+  timeline               TimelineEvent[]
+  messages               Message[]
+  notes                  InterviewNote[]
+  evaluation             Evaluation?
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("interviews")
+}
+
+/// The generated hiring evaluation for a completed interview. Generated ONCE
+/// and stored; the dashboard and report read from here. `report` holds the full
+/// EvaluationReport; scalar columns are denormalized for cheap aggregation.
+model Evaluation {
+  id             String    @id @default(cuid())
+  interviewId    String    @unique
+  interview      Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  overallScore   Int
+  recommendation String
+  report         Json
+  generatedAt    DateTime  @default(now())
+
+  @@map("evaluations")
+}
+
+/// The evolving state of an interview. Scalar/enum columns for the hot fields;
+/// Json for the collections so the shape can grow in later milestones WITHOUT a
+/// migration. One row per interview.
+model InterviewState {
+  id                  String         @id @default(cuid())
+  interviewId         String         @unique
+  interview           Interview      @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  currentStage        InterviewStage @default(INTRODUCTION)
+  currentObjective    String
+  conversationSummary String         @default("") @db.Text
+  /// The topic the interviewer is currently steering toward (null at the start).
+  activeTopic         String?
+
+  // coverage + qualitative areas (native string arrays)
+  coveredTopics       String[]
+  remainingTopics     String[]
+  strongAreas         String[]
+  weakAreas           String[]
+
+  // running quantitative signals
+  confidenceTrend     Float[]
+  technicalAccuracy   Float          @default(0)
+  communicationScore  Float          @default(0)
+
+  // competency signal collections + history (Json, evolvable)
+  behavioralSignals   Json           @default("[]")
+  leadershipSignals   Json           @default("[]")
+  curiositySignals    Json           @default("[]")
+  ownershipSignals    Json           @default("[]")
+  followUpHistory     Json           @default("[]")
+  scoreHistory        Json           @default("[]")
+
+  // progress
+  interviewProgress   Int            @default(0) // 0–100
+  elapsedTimeMs       Int            @default(0)
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@map("interview_states")
+}
+
+/// The interview transcript — one row per spoken/typed turn. Kept separate from
+/// InterviewState so the state stays a bounded structured summary (M3).
+model Message {
+  id          String    @id @default(cuid())
+  interviewId String
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  speaker     Speaker
+  content     String    @db.Text
+  atMs        Int // ms since interview start
+  createdAt   DateTime  @default(now())
+
+  @@index([interviewId])
+  @@map("messages")
+}
+
+/// Hidden interviewer reasoning generated after each candidate answer. Never
+/// surfaced during the interview; consumed by the M6 report.
+model InterviewNote {
+  id          String    @id @default(cuid())
+  interviewId String
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  atMs        Int
+  content     String    @db.Text
+  evaluation  Json?
+  decision    Json?
+  createdAt   DateTime  @default(now())
+
+  @@index([interviewId])
+  @@map("interview_notes")
+}
+
+/// Append-only interview timeline. Structure only in M2; M3+ populate it as the
+/// conversation unfolds (questions, evaluations, stage/difficulty changes).
+model TimelineEvent {
+  id          String            @id @default(cuid())
+  interviewId String
+  interview   Interview         @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  type        TimelineEventType
+  atMs        Int // ms since interview start
+  label       String
+  data        Json?
+  createdAt   DateTime          @default(now())
+
+  @@index([interviewId])
+  @@map("timeline_events")
+}
