@@ -17,7 +17,15 @@ const EnvSchema = z.object({
   CORS_ORIGIN: z
     .string()
     .default('http://localhost:5173')
-    .transform((v) => v.split(',').map((s) => s.trim()).filter(Boolean)),
+    // Split on commas, trim whitespace, and strip any trailing slash — browser
+    // Origin headers never include one, so a stray slash in the env value would
+    // otherwise silently break CORS.
+    .transform((v) =>
+      v
+        .split(',')
+        .map((s) => s.trim().replace(/\/+$/, ''))
+        .filter(Boolean),
+    ),
   DATABASE_URL: z.string().url().optional(),
 
   // M1 — auth. Secrets must be long enough to be meaningful; generate with
