@@ -1,7 +1,14 @@
 import express, { type Express } from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
+import * as helmetModule from 'helmet';
 import cookieParser from 'cookie-parser';
+
+// helmet 8 exposes its middleware factory only as the `default` export, and its
+// package `exports` map has no `types` condition — so `import helmet from 'helmet'`
+// binds to the whole namespace object (not callable) under builders that classify
+// it as CommonJS (e.g. Vercel's). Taking `.default` off the namespace resolves it
+// correctly under any moduleResolution / esModuleInterop setting.
+const helmet = helmetModule.default;
 import { env, isProd } from './env.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { errorHandler } from './middleware/error.js';
