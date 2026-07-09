@@ -16,7 +16,7 @@ export function useRegister() {
 export function useLogin() {
   const setSession = useAuthStore((s) => s.setSession);
   return useMutation<AuthResult, Error, LoginInput>({
-    mutationFn: authApi.login,
+    mutationFn: (input) => authApi.login(input),
     onSuccess: setSession,
   });
 }

@@ -48,16 +48,22 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   _retry?: boolean;
   /** Skip the automatic refresh-on-401 (used by the refresh call itself). */
   skipAuthRefresh?: boolean;
+  /**
+   * Per-request abort timeout. Defaults to {@link REQUEST_TIMEOUT_MS}. Cold-start
+   * calls (health probe, demo login) raise this so they survive the free-tier
+   * backend waking up (~50s) instead of aborting and reporting the API as down.
+   */
+  timeoutMs?: number;
 }
 
 /** Requests abort after this long so a hung network never freezes the UI. */
 const REQUEST_TIMEOUT_MS = 45_000;
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { body, _retry, skipAuthRefresh, headers, ...rest } = options;
+  const { body, _retry, skipAuthRefresh, headers, timeoutMs, ...rest } = options;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs ?? REQUEST_TIMEOUT_MS);
 
   let res: Response;
   try {

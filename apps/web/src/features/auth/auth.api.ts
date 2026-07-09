@@ -4,7 +4,8 @@ import { api } from '@/lib/api';
 /** Thin, typed wrappers around the auth endpoints. */
 export const authApi = {
   register: (input: RegisterInput) => api.post<AuthResult>('/auth/register', input),
-  login: (input: LoginInput) => api.post<AuthResult>('/auth/login', input),
+  login: (input: LoginInput, options?: { timeoutMs?: number }) =>
+    api.post<AuthResult>('/auth/login', input, options),
   me: () => api.get<AuthUser>('/auth/me'),
   logout: () => api.post<{ success: boolean }>('/auth/logout'),
   /**

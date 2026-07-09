@@ -31,7 +31,12 @@ export function Landing() {
   const { data, isLoading, isError } = useHealth();
   const demo = useDemoLogin();
 
+  // While the probe is inflight the free-tier backend may still be cold-starting
+  // (~50s), so we show an amber "warming up" state rather than a red "down".
   const apiState = isLoading ? 'loading' : isError ? 'down' : 'ok';
+  const apiLabel = isLoading
+    ? 'API · warming up…'
+    : `API${data ? ` · up ${data.uptimeSec}s` : ''}`;
   const dbState = isLoading
     ? 'loading'
     : data?.database === 'up'
@@ -71,7 +76,7 @@ export function Landing() {
         <p className="mt-4 text-sm text-slate-500">System status — proving the stack is live</p>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           <StatusPill label="Web" state="ok" />
-          <StatusPill label={`API${data ? ` · ${data.uptimeSec}s` : ''}`} state={apiState} />
+          <StatusPill label={apiLabel} state={apiState} />
           <StatusPill label="Database" state={dbState} />
         </div>
 
