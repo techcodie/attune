@@ -1,0 +1,27 @@
+name: keep-warm
+
+# Render's free tier spins the backend down after ~15 min idle, and the next
+# request then waits ~50s for a cold start — which shows up as red API/Database
+# pills on the landing page. This pings the health endpoint every 10 minutes so
+# the service stays awake and the demo is instant for reviewers.
+#
+# Note: on a private repo this consumes GitHub Actions minutes (free tier is
+# 2,000/mo). At a 10-min cadence that lasts ~2 weeks, after which Actions simply
+# stop (GitHub never bills without an explicit spending limit). For an unlimited,
+# more reliable keep-warm, point a free UptimeRobot/cron-job.org monitor at the
+# same URL, or make this repo public (Actions are free & unlimited on public repos).
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # every 10 minutes
+  workflow_dispatch: {} # allow manual runs from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend health to prevent free-tier spin-down
+        run: |
+          curl -sS -m 90 -o /dev/null \
+            -w "health: HTTP %{http_code} in %{time_total}s\n" \
+            https://mentorque-assignment-1-vrq8.onrender.com/api/v1/health
