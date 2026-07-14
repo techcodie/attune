@@ -21,8 +21,10 @@ export function useDemoLogin() {
 
   const mutation = useMutation({
     mutationFn: () => authApi.login(DEMO_CREDENTIALS, { timeoutMs: 70_000 }),
-    retry: 1,
-    retryDelay: 2_000,
+    // The first attempt wakes a cold backend; a few short retries then land on
+    // the now-warm server so a single click succeeds instead of erroring.
+    retry: 3,
+    retryDelay: 3_000,
     onMutate: () => {
       toast.info('Waking the demo server — this can take up to a minute on the first try…');
     },
