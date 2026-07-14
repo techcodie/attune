@@ -2,7 +2,7 @@
   "name": "cadence",
   "version": "0.1.0",
   "private": true,
-  "description": "Cadence — a voice-first AI mock interview platform. LangGraph is the mind; ElevenLabs is the voice.",
+  "description": "Attune — a voice-first AI mock interview platform. LangGraph is the mind; ElevenLabs is the voice.",
   "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=20.11.0"

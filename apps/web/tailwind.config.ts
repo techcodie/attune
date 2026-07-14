@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Cadence design tokens. Dark-first. A restrained palette — one accent
+ * Attune design tokens. Dark-first. A restrained palette — one accent
  * (violet→cyan) against deep slate — so the UI reads premium, not busy.
  */
 export default {

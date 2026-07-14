@@ -1,4 +1,4 @@
-// Cadence database schema.
+// Attune database schema.
 // M0 established the datasource + generator.
 // M1 adds real auth (User + RefreshToken) and the candidate Profile that will
 // seed InterviewState in M2/M3.

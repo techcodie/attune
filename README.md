@@ -1,8 +1,8 @@
-# Cadence
+# Attune
 
 **A voice-first AI mock interview platform that reasons about the conversation before deciding what to say.**
 
-Cadence feels like talking to a real interviewer — not ChatGPT with a microphone. Every question is chosen by a stateful engine that evaluates your answer, tracks topic coverage, adjusts difficulty, and decides its next move — then a language model only *phrases* that decision naturally. When the interview ends, you get a hiring-panel-grade evaluation with scores, a recommendation, a transparent timeline, and a learning roadmap.
+Attune feels like talking to a real interviewer — not ChatGPT with a microphone. Every question is chosen by a stateful engine that evaluates your answer, tracks topic coverage, adjusts difficulty, and decides its next move — then a language model only *phrases* that decision naturally. When the interview ends, you get a hiring-panel-grade evaluation with scores, a recommendation, a transparent timeline, and a learning roadmap.
 
 > **Demo login** (after `pnpm db:seed`): `demo@cadence.app` / `Demo1234!` — lands on a populated dashboard with two evaluated interviews and one ready to start.
 
@@ -10,7 +10,7 @@ Cadence feels like talking to a real interviewer — not ChatGPT with a micropho
 
 ## Problem statement
 
-Generic "AI interview" tools prompt an LLM with the chat history and ask it to "be an interviewer." The result drifts, repeats itself, never adapts difficulty, and can't explain *why* it asked anything. Cadence treats the interview as a **state machine the model serves**, not a transcript the model rambles over:
+Generic "AI interview" tools prompt an LLM with the chat history and ask it to "be an interviewer." The result drifts, repeats itself, never adapts difficulty, and can't explain *why* it asked anything. Attune treats the interview as a **state machine the model serves**, not a transcript the model rambles over:
 
 - **State-driven, not prompt-driven** — the prompt is built from a structured `InterviewState`, never from raw messages.
 - **The decision is deterministic; the phrasing is the model's** — a pure policy picks the next action (follow-up, challenge, move on, raise difficulty…) *and the reason*, then the LLM renders it in natural language.
